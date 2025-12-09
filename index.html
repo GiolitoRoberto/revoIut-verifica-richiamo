@@ -171,36 +171,55 @@
   .separator:not(:empty)::after {
     margin-left: 14px;
   }
-  /* Social logins */
-  .socials {
-    display: flex;
-    gap: 35px;
-    justify-content: start;
-    margin-bottom: 26px;
-  }
-  .social-btn {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    cursor: pointer;
-    color: white;
-    font-size: 12px;
-    user-select: none;
-  }
-  .social-btn svg {
-    width: 32px;
-    height: 32px;
-  }
-  .social-label {
-    font-weight: 600;
-    margin-top: 6px;
-  }
-  .social-google svg {
-    fill: none;
-  }
-  .social-google circle {
-    fill: white;
-  }
+
+
+  
+/* Social logins */
+.socials {
+  display: flex;
+  gap: 32px;
+  justify-content: center;
+  margin-bottom: 26px;
+}
+
+.social-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+  color: white;
+  font-size: 12px;
+  user-select: none;
+}
+
+.social-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.06); /* soft circle like Revolut */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.social-icon svg {
+  width: 20px;
+  height: 20px;
+}
+
+.social-label {
+  font-weight: 600;
+  margin-top: 6px;
+}
+
+/* Optional: remove custom Google circle, let the container handle it */
+.social-google svg {
+  fill: currentColor;
+}
+
+
+
+  
   /* Create account */
   .create-account-wrapper {
     text-align: center;
@@ -451,3 +470,4 @@
   </script>
 </body>
 </html>
+
